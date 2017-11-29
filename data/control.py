@@ -1,6 +1,6 @@
 import pygame as pg
  
-from data import (
+from . import (
     prepare,
     tools,
     label,
