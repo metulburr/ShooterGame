@@ -3,7 +3,12 @@ import math
 import random
 import os
  
-from data import prepare, tools
+from data import (
+    prepare,
+    tools,
+    label,
+)
+
    
 class Enemy:
     total = 3
@@ -123,7 +128,7 @@ class Player:
          
     def take_damage(self, value):
         self.damage -= value
-        TOOLS.update_damage(self.damage)
+        damage_label.update(self.damage)
      
     def get_event(self, event):
         if event.type == pg.KEYDOWN:
@@ -131,7 +136,6 @@ class Player:
                 if self.add_laser:
                     self.lasers.append(Laser(self.rect.center, self.screen_rect))
                     self.add_laser = False
-                    #TOOLS.laser.play()
                     prepare.SFX['beep'].play()
      
     def update(self, keys, dt, enemies):
@@ -153,7 +157,6 @@ class Player:
         if self.damage <= 0:
             self.damage = 0
             self.dead = True
-            #TOOLS.game_over_sound.play()
             prepare.SFX['game_over'].play()
          
     def check_laser_collision(self, enemies):
@@ -175,7 +178,7 @@ class Player:
          
     def add_score(self, amt):
         self.score += amt
-        TOOLS.update_text(self.score)
+        score_label.update(self.score)
      
 class EnemyController:
     def __init__(self):
@@ -208,44 +211,10 @@ class EnemyController:
                 player.add_score(25)
                 self.enemies.append(self.randomized_enemy())
             e.draw(prepare.SCREEN)
-             
-class Tools:
-    def __init__(self, screen):
-        self.screen = screen
-        self.screen_rect = screen.get_rect()
-        self.font_init(self.screen_rect)
-         
-    def font_init(self, screen_rect):
-        self.text_size = 15
-        self.text_color = (255,255,255)
-        self.score_pos = (10,10)
-        self.damage_pos = (10,30)
-        self.font = pg.font.SysFont('Arial', self.text_size)
-        self.update_text()
-        self.update_damage()
-        self.game_over()
-         
-    def update_text(self, score=0):
-        self.text, self.text_rect = self.make_text('Score: {}'.format(score), self.score_pos)
-         
-    def update_damage(self, damage=None):
-        self.damage, self.damage_rect = self.make_text('Damage: {}'.format(damage), self.damage_pos)
-         
-    def make_text(self,message, pos):
-        text = self.font.render(message,True,self.text_color)
-        rect = text.get_rect(topleft=pos)
-        return text, rect
-         
-    def game_over(self):
-        game_over_font = pg.font.SysFont('Arial', 45)
-        self.game_over_text = game_over_font.render('Game Over',True,(255,0,0))
-        self.game_over_rect = self.game_over_text.get_rect(center=self.screen_rect.center)
-         
-    def draw(self):
-        self.screen.blit(self.text, self.text_rect)
-        self.screen.blit(self.damage, self.damage_rect)
-
-TOOLS = Tools(prepare.SCREEN)
+    
+game_over_label = label.GameOverText(prepare.SCREEN_RECT)
+score_label = label.TopLeftText((10,10), 'Score: {}', None, prepare.SCREEN_RECT)
+damage_label = label.TopLeftText((10,30), 'Damage: {}', None, prepare.SCREEN_RECT)
 player = Player(prepare.SCREEN_RECT)
 enemy_control = EnemyController()
 clock = pg.time.Clock()
@@ -262,7 +231,8 @@ while not done:
         player.update(keys, delta_time, enemy_control.enemies)
         enemy_control.update(delta_time, player)
     else:
-        prepare.SCREEN.blit(TOOLS.game_over_text, TOOLS.game_over_rect)
+        game_over_label.draw(prepare.SCREEN)
+    score_label.draw(prepare.SCREEN)
+    damage_label.draw(prepare.SCREEN)
     player.draw(prepare.SCREEN)
-    TOOLS.draw()
     pg.display.update()
