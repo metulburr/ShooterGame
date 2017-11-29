@@ -10,6 +10,7 @@ class Enemy:
     def __init__(self, images, screen_rect, start_pos):
         self.screen_rect = screen_rect
         self.image = images[0]
+        #self.image.set_colorkey((255,0,255))
         self.mask = images[1]
         start_buffer = 0
         self.rect = self.image.get_rect(
@@ -190,6 +191,7 @@ class EnemyController:
         image.set_colorkey((255,0,255))
         transformed_image = pg.transform.rotate(image, 180)
         orig_image = pg.transform.scale(transformed_image, (40,80))
+        orig_image = orig_image.convert_alpha()
         mask = pg.mask.from_surface(orig_image)
         return (orig_image, mask)
              
