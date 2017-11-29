@@ -3,8 +3,7 @@ import math
 import random
 import os
  
-pg.mixer.pre_init(44100, -16, 1, 512)
-pg.init()
+from data import prepare, tools
    
 class Enemy:
     total = 3
@@ -102,7 +101,8 @@ class Laser:
 class Player:
     def __init__(self, screen_rect):
         self.screen_rect = screen_rect
-        self.image = pg.image.load('spaceship.png').convert()
+        #self.image = pg.image.load('spaceship.png').convert()
+        self.image = prepare.GFX['spaceship']
         self.image.set_colorkey((255,0,255))
         self.mask = pg.mask.from_surface(self.image)
         self.transformed_image = pg.transform.rotate(self.image, 180)
@@ -130,7 +130,8 @@ class Player:
                 if self.add_laser:
                     self.lasers.append(Laser(self.rect.center, self.screen_rect))
                     self.add_laser = False
-                    TOOLS.laser.play()
+                    #TOOLS.laser.play()
+                    prepare.SFX['beep'].play()
      
     def update(self, keys, dt, enemies):
         self.rect.clamp_ip(self.screen_rect)
@@ -151,7 +152,8 @@ class Player:
         if self.damage <= 0:
             self.damage = 0
             self.dead = True
-            TOOLS.game_over_sound.play()
+            #TOOLS.game_over_sound.play()
+            prepare.SFX['game_over'].play()
          
     def check_laser_collision(self, enemies):
         for laser in self.lasers[:]:
@@ -183,7 +185,8 @@ class EnemyController:
             self.enemies.append(self.randomized_enemy())
          
     def enemy_image_load(self):
-        image = pg.image.load('enemy.png').convert()
+        #image = pg.image.load('enemy.png').convert()
+        image = prepare.GFX['enemy']
         image.set_colorkey((255,0,255))
         transformed_image = pg.transform.rotate(image, 180)
         orig_image = pg.transform.scale(transformed_image, (40,80))
@@ -192,8 +195,8 @@ class EnemyController:
              
     def randomized_enemy(self):
         y = random.randint(-500, -100) #above screen
-        x = random.randint(0, screen_rect.width)
-        return Enemy(self.enemy_image, screen_rect, (x,y))
+        x = random.randint(0, prepare.SCREEN_RECT.width)
+        return Enemy(self.enemy_image, prepare.SCREEN_RECT, (x,y))
          
     def update(self, dt, player):
         for e in self.enemies[:]:
@@ -202,13 +205,12 @@ class EnemyController:
                 self.enemies.remove(e)
                 player.add_score(25)
                 self.enemies.append(self.randomized_enemy())
-            e.draw(screen)
+            e.draw(prepare.SCREEN)
              
 class Tools:
     def __init__(self, screen):
         self.screen = screen
         self.screen_rect = screen.get_rect()
-        self.sound_init()
         self.font_init(self.screen_rect)
          
     def font_init(self, screen_rect):
@@ -240,22 +242,9 @@ class Tools:
     def draw(self):
         self.screen.blit(self.text, self.text_rect)
         self.screen.blit(self.damage, self.damage_rect)
-         
-    def sound_init(self):
-        directory_of_sounds = '.' #current directory == '.'
-        self.laser = self.load_sound_file('beep.wav', directory_of_sounds)
-        self.laser.set_volume(.1)
-        self.game_over_sound = self.load_sound_file('game_over.wav', directory_of_sounds)
-        self.game_over_sound.set_volume(.2)
-         
-    def load_sound_file(self, filename, directory):
-        fullname = os.path.join(directory, filename)
-        return pg.mixer.Sound(fullname)
-     
-screen = pg.display.set_mode((800,600))
-screen_rect = screen.get_rect()
-TOOLS = Tools(screen)
-player = Player(screen_rect)
+
+TOOLS = Tools(prepare.SCREEN)
+player = Player(prepare.SCREEN_RECT)
 enemy_control = EnemyController()
 clock = pg.time.Clock()
 done = False
@@ -265,13 +254,13 @@ while not done:
         if event.type == pg.QUIT:
             done = True
         player.get_event(event)
-    screen.fill((0,0,0))
+    prepare.SCREEN.fill((0,0,0))
     delta_time = clock.tick(60)/1000.0
     if not player.dead:
         player.update(keys, delta_time, enemy_control.enemies)
         enemy_control.update(delta_time, player)
     else:
-        screen.blit(TOOLS.game_over_text, TOOLS.game_over_rect)
-    player.draw(screen)
+        prepare.SCREEN.blit(TOOLS.game_over_text, TOOLS.game_over_rect)
+    player.draw(prepare.SCREEN)
     TOOLS.draw()
     pg.display.update()
