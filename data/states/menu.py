@@ -1,5 +1,5 @@
 import pygame as pg
-from . import tools, label, prepare
+from .. import tools, label, prepare
 
 class Menu(tools.States):
     def __init__(self):

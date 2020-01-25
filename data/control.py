@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
-from . import prepare, menu, game
+from . import prepare
+from .states import menu, game
   
 class Control:
     def __init__(self):
