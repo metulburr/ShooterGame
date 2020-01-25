@@ -5,6 +5,7 @@ from . import tools
 
 CAPTION = "ShooterGame"
 WINSIZE = (800,600)
+FPS = 60
 
 #stop delay on sound
 pg.mixer.pre_init(44100, -16, 1, 512)

@@ -1,6 +1,13 @@
 import os
 import pygame as pg
 
+class States(object):
+    def __init__(self):
+        self.done = False
+        self.next = None
+        self.quit = False
+        self.previous = None
+
 def load_all_sfx(directory, accept=(".wav", ".mp3", ".ogg", ".mdi")):
     """
     Load all sfx of extensions found in accept.  Unfortunately it is

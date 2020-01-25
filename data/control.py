@@ -1,34 +1,49 @@
 import pygame as pg
- 
-from . import (
-    prepare,
-    tools,
-    label,
-    enemy,
-    player,
-)
-    
-game_over_label = label.GameOverText(prepare.SCREEN_RECT)
-score_label = label.TopLeftText((10,10), 'Score: {}', None, prepare.SCREEN_RECT)
-damage_label = label.TopLeftText((10,30), 'Damage: {}', None, prepare.SCREEN_RECT)
-player = player.Player(prepare.SCREEN_RECT)
-enemy_control = enemy.EnemyController()
-clock = pg.time.Clock()
-done = False
-while not done:
-    keys = pg.key.get_pressed()
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            done = True
-        player.get_event(event)
-    prepare.SCREEN.fill((0,0,0))
-    delta_time = clock.tick(60)/1000.0
-    if not player.dead:
-        player.update(keys, delta_time, enemy_control.enemies)
-        enemy_control.update(delta_time, player, score_label, damage_label)
-    else:
-        game_over_label.draw(prepare.SCREEN)
-    score_label.draw(prepare.SCREEN)
-    damage_label.draw(prepare.SCREEN)
-    player.draw(prepare.SCREEN)
-    pg.display.update()
+import sys
+from . import prepare, menu, game
+  
+class Control:
+    def __init__(self):
+        self.done = False
+        self.screen = pg.display.set_mode(prepare.WINSIZE)
+        self.clock = pg.time.Clock()
+    def setup_states(self, state_dict, start_state):
+        self.state_dict = state_dict
+        self.state_name = start_state
+        self.state = self.state_dict[self.state_name]
+    def flip_state(self):
+        self.state.done = False
+        previous,self.state_name = self.state_name, self.state.next
+        self.state.cleanup()
+        self.state = self.state_dict[self.state_name]
+        self.state.startup()
+        self.state.previous = previous
+    def update(self, dt):
+        keys = pg.key.get_pressed()
+        if self.state.quit:
+            self.done = True
+        elif self.state.done:
+            self.flip_state()
+        self.state.update(self.screen, dt, keys)
+    def event_loop(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.done = True
+            self.state.get_event(event)
+    def main_game_loop(self):
+        while not self.done:
+            delta_time = self.clock.tick(prepare.FPS)/1000.0
+            self.event_loop()
+            self.update(delta_time)
+            pg.display.update()
+  
+  
+app = Control()
+state_dict = {
+    'menu': menu.Menu(),
+    'game': game.Game()
+}
+app.setup_states(state_dict, 'menu')
+app.main_game_loop()
+pg.quit()
+sys.exit()
