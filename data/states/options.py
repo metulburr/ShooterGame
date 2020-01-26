@@ -1,12 +1,12 @@
 import pygame as pg
 from .. import tools, label, prepare
 
-class Menu(tools.States):
+class Options(tools.States):
     def __init__(self):
         tools.States.__init__(self)
         self.next = 'game'
-        self.options = ['Play', 'Options', 'Quit']
-        self.next_list = ['game', 'options']
+        self.options = ['Audio', 'Graphics', 'Test', 'Back']
+        self.next_list = ['menu', 'menu', 'menu', 'menu']
         self.pre_render_options()
         self.from_bottom = 200
         self.spacer = 75
@@ -32,7 +32,7 @@ class Menu(tools.States):
         self.change_selected_option()
         self.draw(screen)
     def draw(self, screen):
-        screen.fill((255,0,0))
+        screen.fill((0,255,0))
         for i,opt in enumerate(self.rendered["des"]):
             opt[1].center = (prepare.SCREEN_RECT.centerx, self.from_bottom+i*self.spacer)
             if i == self.selected_index:
