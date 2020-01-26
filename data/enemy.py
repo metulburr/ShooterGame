@@ -11,6 +11,11 @@ class EnemyController:
         self.max_enemies = 3
         for i in range(self.max_enemies):
             self.enemies.append(self.randomized_enemy())
+            
+    def restart(self):
+        self.enemies = []
+        for i in range(self.max_enemies):
+            self.enemies.append(self.randomized_enemy())
          
     def enemy_image_load(self):
         #image = pg.image.load('enemy.png').convert()

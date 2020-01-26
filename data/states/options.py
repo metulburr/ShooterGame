@@ -6,7 +6,7 @@ class Options(tools.States):
         tools.States.__init__(self)
         self.next = 'game'
         self.options = ['Audio', 'Graphics', 'Test', 'Back']
-        self.next_list = ['menu', 'menu', 'menu', 'menu']
+        self.next_list = ['options', 'options', 'options', 'menu']
         self.pre_render_options()
         self.from_bottom = 200
         self.spacer = 75

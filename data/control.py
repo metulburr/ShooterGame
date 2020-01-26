@@ -1,7 +1,7 @@
 import pygame as pg
 import sys
 from . import prepare
-from .states import menu, game, options
+from .states import menu, game, options, game_over
   
 class Control:
     def __init__(self):
@@ -44,6 +44,7 @@ state_dict = {
     'menu'      : menu.Menu(),
     'game'      : game.Game(),
     'options'   : options.Options(),
+    'game_over' : game_over.GameOver(),
 }
 app.setup_states(state_dict, 'menu')
 app.main_game_loop()

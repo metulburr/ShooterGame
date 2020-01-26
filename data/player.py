@@ -22,7 +22,7 @@ class Player:
         self.damage = 10
         self.score = 0
         self.dead = False
-         
+        
     def take_damage(self, value):
         self.damage -= value
      
