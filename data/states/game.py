@@ -5,11 +5,13 @@ from .. import (
     label,
     enemy,
     player,
+    menu_manager
 )
 
-class Game(tools.States):
+class Game(tools.States, menu_manager.MenuManager):
     def __init__(self):
         tools.States.__init__(self)
+        menu_manager.MenuManager.__init__(self)
         self.next = 'menu'
         self.score_label = label.TopLeftText((10,10), 'Score: {}', None, prepare.SCREEN_RECT)
         self.damage_label = label.TopLeftText((10,30), 'Damage: {}', None, prepare.SCREEN_RECT)

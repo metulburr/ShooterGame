@@ -5,11 +5,13 @@ from .. import (
     label,
     enemy,
     player,
+    menu_manager,
 )
 
-class GameOver(tools.States):
+class GameOver(tools.States, menu_manager.MenuManager):
     def __init__(self):
         tools.States.__init__(self)
+        menu_manager.MenuManager.__init__(self)
         self.next = 'menu'
         self.game_over_label = label.GameOverText(prepare.SCREEN_RECT)
     def cleanup(self):
